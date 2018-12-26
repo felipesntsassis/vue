@@ -1,60 +1,79 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+    <p>{{ total }}</p>
+
+    <button @click="calcula('-')"> - </button>
+    <button @click="calcula('+')"> + </button>
+
+    <p>Nome Iniciado: {{ nome }}</p>
+    <p>Nome Filtrado: {{ nome | formataNome }}</p>
+    <p>Nome Computado: {{ nomeFormatado }}</p>
+    <label>Input a computar</label>
+    <input type="text" v-model="nomeFormatado">
+    <br>
+    <label>Input a observar</label>
+    <input type="text" v-model="busca">
+    <p v-text="resultado"></p>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'app',
+  name: 'lv-contador',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      total: 10,
+      nome: 'jose antonio',
+      resultado: '',
+      busca: ''
+    }
+  },
+  methods: {
+    calcula(sinal) {
+      this.total = (sinal === '-') ? this.total - 1 : this.total + 1
+    }
+  },
+  filters: {
+    formataNome(valor) {
+      console.log('Executando filter');
+      valor = valor.toLowerCase();
+      let corta = valor.split(' ');
+      let resultado = '';
+      for (let nome of corta)
+        resultado += nome.charAt(0).toUpperCase() + nome.slice(1) + ' ';
+
+      return resultado;
+    }
+  },
+  computed: {
+    /* nomeFormatado() {
+      console.log('Executando computed');
+      return this.nome.toUpperCase();
+    } */
+    nomeFormatado: {
+      get: function () {
+        console.log('Executando computed');
+        return this.nome.toUpperCase();
+      },
+      set: function (novoValor) {
+        this.nome = novoValor.substring(0, 3);
+      }
+    }
+  },
+  watch: {
+    busca: function (novoValor, valorAntigo) {
+      this.resultado = 'Aguardando o término da digitação...';
+      this.recolheResposta();
+    }
+  },
+  methods: {
+    recolheResposta() {
+      let valor = this.busca;
+      setTimeout(() => {
+        if (valor === this.busca)
+          this.resultado = 'Terminou de digitar...';
+      }, 2000);
     }
   }
 }
 </script>
-
-<style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-
-h1, h2 {
-  font-weight: normal;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
-}
-</style>
